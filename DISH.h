@@ -1,8 +1,8 @@
 #ifndef DISH_H
 #define DISH_H
 #define HOSTS_DIR "C:\\Windows\\System32\\drivers\\etc\\hosts"
-#define WORKING_PEPPER "/home/asilvajr/teamdew-swars/pepper-icon.png"
-#define BROKEN_PEPPER "/home/asilvajr/teamdew-swars/broken-pepper-icon.png"
+#define WORKING_PEPPER "pepper-icon.png"
+#define BROKEN_PEPPER "broken-pepper-icon.png"
 #include <QMenu>
 #include <QSystemTrayIcon>
 
