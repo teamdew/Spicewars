@@ -2,6 +2,9 @@
 
 #include "DISH.h"
 #include <QApplication>
+#include <iostream>
+
+using namespace std;
 
 
 
@@ -117,9 +120,24 @@ void DISH::iconSetup()
 {
     //absolute path, terrible fix this later
     //also this code should not live here at allll!!@!@!$!@
-    QIcon icon = QIcon(WORKING_PEPPER);
+    icon = QIcon(WORKING_PEPPER);
     
     trayIcon->setIcon(icon);
     trayIcon->setContextMenu(trayMenu);
     trayIcon->show();
+    
+    setIcon(false);
+}
+
+void DISH::setIcon(bool up)
+{
+    if(up)
+        icon = QIcon(WORKING_PEPPER);
+    else
+        icon = QIcon(BROKEN_PEPPER);
+    
+    trayIcon->setIcon(icon);
+    trayIcon->setContextMenu(trayMenu);
+    trayIcon->show();
+        
 }

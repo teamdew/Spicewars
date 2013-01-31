@@ -19,6 +19,7 @@ class DISH{
 //                bool checkServer();
                 void createMenu();
                 void iconSetup();
+                QIcon icon;
         private:
                 QMenu *trayMenu;
                 QSystemTrayIcon *trayIcon;
@@ -47,6 +48,7 @@ class DISH{
                 QAction *releaseCheckButton;
                 
                 QAction *quit;
+                void setIcon(bool up);
                         
                 
                 
