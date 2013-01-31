@@ -1,10 +1,13 @@
 #ifndef DISH_H
 #define DISH_H
-#define HOSTS_DIR "C:\\Windows\\System32\\drivers\\etc\\hosts"
+//#define HOSTS_DIR "C:\\Windows\\System32\\drivers\\etc\\hosts"
+//if testing on a linux box use this instead
+#define HOSTS_DIR "\\etc\\hosts"
 #define WORKING_PEPPER "pepper-icon.png"
 #define BROKEN_PEPPER "broken-pepper-icon.png"
 #include <QMenu>
 #include <QSystemTrayIcon>
+#include <QDialog>
 
 //QT_BEGIN_NAMESPACE
 //class QAction;
@@ -13,14 +16,20 @@
 //class QMenu;
 //QT_END_NAMESPACE
 
-class DISH{
-        public:
+class DISH : public QDialog{
+       Q_OBJECT;
+       
+       public:
                 DISH();
 //                bool checkServer();
                 void createMenu();
                 void iconSetup();
                 QIcon icon;
-        private:
+        
+       private slots:
+                void editHosts();
+                
+       private:
                 QMenu *trayMenu;
                 QSystemTrayIcon *trayIcon;
                 
@@ -49,6 +58,8 @@ class DISH{
                 
                 QAction *quit;
                 void setIcon(bool up);
+                
+        
                         
                 
                 

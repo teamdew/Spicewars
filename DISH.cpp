@@ -3,6 +3,7 @@
 #include "DISH.h"
 #include <QApplication>
 #include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -21,6 +22,11 @@ DISH::DISH()
 
 //still need to do connect for all of the buttons sans Quit
 //creates the menu
+
+void DISH::editHosts()
+{
+    system("gedit //etc//hosts");
+}
 void DISH::createMenu()
 {
     
@@ -61,6 +67,7 @@ void DISH::createMenu()
     
     editButton = new QAction("&Edit current hosts file", hostsSubmenu);
     hostsSubmenu->addAction(editButton);
+    QObject::connect(editButton, SIGNAL(triggered()), this, SLOT(editHosts()));
     
     newHostsButton = new QAction("&New hosts file", hostsSubmenu);
     hostsSubmenu->addAction(newHostsButton);
@@ -118,15 +125,13 @@ void DISH::createMenu()
 //sets the tray icon
 void DISH::iconSetup()
 {
-    //absolute path, terrible fix this later
-    //also this code should not live here at allll!!@!@!$!@
+
     icon = QIcon(WORKING_PEPPER);
     
     trayIcon->setIcon(icon);
     trayIcon->setContextMenu(trayMenu);
     trayIcon->show();
     
-    setIcon(false);
 }
 
 void DISH::setIcon(bool up)
