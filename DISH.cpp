@@ -5,11 +5,12 @@
 #include <iostream>
 #include <fstream>
 #include <dirent.h>
-#include "boost/filesystem.hpp" 
+#include "boost/filesystem.hpp"
+#include <boost/regex.hpp>
 
 
 using namespace std;
-using namespace boost::filesystem; 
+using namespace boost::filesystem;
 
 
 
@@ -17,6 +18,7 @@ DISH::DISH()
 {
     trayMenu = new QMenu();
     trayIcon = new QSystemTrayIcon();
+    getHostsList();
 }
 
 //bool checkServer() 
@@ -36,6 +38,19 @@ void DISH::openHostsDir()
 {
     system("gnome-open //etc");
 }
+
+void DISH::getHostsList()
+{
+    path dir_path = path (HOSTS_DIR);
+    directory_iterator end_itr;
+    boost::regex re("^hosts.*");
+
+    for (directory_iterator itr(dir_path); itr != end_itr; ++itr)
+        if(is_regular_file(itr->status())  && boost::regex_match(itr->path().filename().c_str(), re))
+            hostsVector.push_back(itr->path().filename().c_str());
+    
+}
+
 void DISH::createMenu()
 {
     urlSubmenu = trayMenu->addMenu("URL");
