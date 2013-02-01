@@ -7,7 +7,9 @@
 #include <dirent.h>
 #include "boost/filesystem.hpp"
 #include <boost/regex.hpp>
-
+#include <QString>
+#include <QLineEdit>
+#include <string.h>
 
 using namespace std;
 using namespace boost::filesystem;
@@ -29,9 +31,37 @@ DISH::DISH()
 //still need to do connect for all of the buttons sans Quit
 //creates the menu
 
+void DISH::changeURL()
+{
+    string urlCall = "url";
+    dialog urlDialog(urlCall);
+    
+    if (urlDialog.exec())
+    {
+        QString url = urlDialog.urlText->text();
+        cout << url.toStdString();
+    }
+}
+
 void DISH::editHosts()
 {
     system("gedit //etc//hosts");
+}
+
+void DISH::newHosts()
+{
+    string hosts = "hosts";
+    dialog hostsDialog(hosts);
+    
+    if (hostsDialog.exec())
+    {
+        QString fileName = hostsDialog.fileNameText->text();
+        cout << fileName.toStdString();
+        
+        string command = "sudo gedit //etc//" + fileName.toStdString();
+        
+        system(command.c_str());
+    }
 }
 
 void DISH::openHostsDir()
@@ -58,6 +88,8 @@ void DISH::createMenu()
      
    changeURLButton = new QAction("&Change URL", urlSubmenu);
     urlSubmenu->addAction(changeURLButton);
+    QObject::connect(changeURLButton, SIGNAL(triggered()), this, SLOT(changeURL()));
+
     
     defaultURLButton = new QAction("&Default URL", urlSubmenu);
     urlSubmenu->addAction(defaultURLButton);
@@ -97,7 +129,8 @@ void DISH::createMenu()
     
     newHostsButton = new QAction("&New hosts file", hostsSubmenu);
     hostsSubmenu->addAction(newHostsButton);
-    
+    QObject::connect(newHostsButton, SIGNAL(triggered()), this, SLOT(newHosts()));
+
     
     refreshButton = new QAction("&Refresh", hostsSubmenu);
     hostsSubmenu->addAction(refreshButton);

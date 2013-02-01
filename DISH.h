@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QDialog>
+#include <dialog.h>
 
 using namespace std;
 
@@ -29,7 +30,9 @@ class DISH : public QDialog{
                 QIcon icon;
         
        private slots:
+                void changeURL(); 
                 void editHosts();
+                void newHosts();
                 void openHostsDir();
                 
        private:
