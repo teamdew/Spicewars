@@ -54,8 +54,9 @@ void DISH::getHostsList()
 void DISH::createMenu()
 {
     urlSubmenu = trayMenu->addMenu("URL");
-    
-    changeURLButton = new QAction("&Change URL", urlSubmenu);
+
+     
+   changeURLButton = new QAction("&Change URL", urlSubmenu);
     urlSubmenu->addAction(changeURLButton);
     
     defaultURLButton = new QAction("&Default URL", urlSubmenu);
@@ -66,9 +67,14 @@ void DISH::createMenu()
     
     trayMenu->addSeparator();
     
+
+    for (unsigned int x = 0; x < hostsVector.size(); x++)
+    {
+        trayMenu->addAction(new QAction(hostsVector[x].c_str(), trayMenu) );
+    }
     
-    
-    
+    trayMenu->addSeparator();
+
     adminButton = new QAction("&Make Spice admin", trayMenu);
     trayMenu->addAction(adminButton);
     
