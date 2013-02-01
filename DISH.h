@@ -28,6 +28,7 @@ class DISH : public QDialog{
         
        private slots:
                 void editHosts();
+                void openHostsDir();
                 
        private:
                 QMenu *trayMenu;

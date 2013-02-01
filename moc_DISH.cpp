@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'DISH.h'
 **
-** Created: Thu Jan 31 17:38:15 2013
+** Created: Thu Jan 31 20:32:25 2013
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.1)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -23,7 +23,7 @@ static const uint qt_meta_data_DISH[] = {
        6,       // revision
        0,       // classname
        0,    0, // classinfo
-       1,   14, // methods
+       2,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -32,12 +32,13 @@ static const uint qt_meta_data_DISH[] = {
 
  // slots: signature, parameters, type, tag, flags
        6,    5,    5,    5, 0x08,
+      18,    5,    5,    5, 0x08,
 
        0        // eod
 };
 
 static const char qt_meta_stringdata_DISH[] = {
-    "DISH\0\0editHosts()\0"
+    "DISH\0\0editHosts()\0openHostsDir()\0"
 };
 
 void DISH::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
@@ -47,6 +48,7 @@ void DISH::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
         DISH *_t = static_cast<DISH *>(_o);
         switch (_id) {
         case 0: _t->editHosts(); break;
+        case 1: _t->openHostsDir(); break;
         default: ;
         }
     }
@@ -85,9 +87,9 @@ int DISH::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 1)
+        if (_id < 2)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 1;
+        _id -= 2;
     }
     return _id;
 }
