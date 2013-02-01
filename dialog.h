@@ -8,45 +8,37 @@
 #ifndef DIALOG_H
 #define	DIALOG_H
 
- #include <QtGui>
- #include "adddialog.h"
+  #include <QDialog>
+#include <QWidget>
+#include <string>
 
- dialog::AddDialog(QWidget *parent)
-     : QDialog(parent)
+using namespace std;
+
+ class QLabel;
+ class QPushButton;
+ class QTextEdit;
+ class QLineEdit;
+
+ class dialog : public QDialog
  {
-     nameLabel = new QLabel("Name");
-     okButton = new QPushButton("OK");
-     cancelButton = new QPushButton("Cancel");
+     Q_OBJECT
+ public:
+     dialog(string);
+     dialog(bool);
+     QLineEdit *fileNameText;
+     QLineEdit *usernameText;
+     QLineEdit *passwordText;
+     QLineEdit *emailText;
+     QLineEdit *urlText;
 
-     nameText = new QLineEdit;
-     addressText = new QTextEdit;
-
-     QGridLayout *gLayout = new QGridLayout;
-     gLayout->setColumnStretch(1, 2);
-     gLayout->addWidget(nameLabel, 0, 0);
-     gLayout->addWidget(nameText, 0, 1);
-
-     gLayout->addWidget(addressLabel, 1, 0, Qt::AlignLeft|Qt::AlignTop);
-     gLayout->addWidget(addressText, 1, 1, Qt::AlignLeft);
-
-     QHBoxLayout *buttonLayout = new QHBoxLayout;
-     buttonLayout->addWidget(okButton);
-     buttonLayout->addWidget(cancelButton);
-
-     gLayout->addLayout(buttonLayout, 2, 1, Qt::AlignRight);
-
-     QVBoxLayout *mainLayout = new QVBoxLayout;
-     mainLayout->addLayout(gLayout);
-     setLayout(mainLayout);
-
-     connect(okButton, SIGNAL(clicked()),
-             this, SLOT(accept()));
-
-     connect(cancelButton, SIGNAL(clicked()),
-             this, SLOT(reject()));
-
-     setWindowTitle(tr("Add a Contact"));
- }
+ private:
+     QLabel *fileNameLabel;
+     QLabel *usernameLabel;
+     QLabel *passwordLabel;
+     QLabel *emailLabel;
+     QLabel *urlLabel;
+     QPushButton *okButton;
+     QPushButton *cancelButton;
+ };
 
 #endif	/* DIALOG_H */
-
