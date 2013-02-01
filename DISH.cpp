@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <iostream>
 #include <fstream>
+#include <dirent.h>
 
 using namespace std;
 
@@ -27,12 +28,13 @@ void DISH::editHosts()
 {
     system("gedit //etc//hosts");
 }
+
+void DISH::openHostsDir()
+{
+    system("gnome-open //etc");
+}
 void DISH::createMenu()
 {
-    
-    
-        
-    
     urlSubmenu = trayMenu->addMenu("URL");
     
     changeURLButton = new QAction("&Change URL", urlSubmenu);
@@ -72,11 +74,13 @@ void DISH::createMenu()
     newHostsButton = new QAction("&New hosts file", hostsSubmenu);
     hostsSubmenu->addAction(newHostsButton);
     
+    
     refreshButton = new QAction("&Refresh", hostsSubmenu);
     hostsSubmenu->addAction(refreshButton);
     
     hostsDirButton = new QAction("&Go to hosts file directory", hostsSubmenu);
     hostsSubmenu->addAction(hostsDirButton);
+    QObject::connect(hostsDirButton, SIGNAL(triggered()), this, SLOT(openHostsDir()));
     
     messageButton = new QAction("&Message", trayMenu);
     trayMenu->addAction(messageButton);
