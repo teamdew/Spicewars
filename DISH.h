@@ -45,6 +45,10 @@ class DISH : public QDialog{
                 QAction *defaultURLButton;
                 QAction *clearCacheButton;
                 
+                QMenu *userHostsSubMenu;
+                QAction *openPuttyButton;
+                QAction *communityLogsButton;
+                
                 QAction *adminButton;
                 QAction *tailProdButton;
                 

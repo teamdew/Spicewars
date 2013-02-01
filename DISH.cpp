@@ -102,7 +102,15 @@ void DISH::createMenu()
 
     for (unsigned int x = 0; x < hostsVector.size(); x++)
     {
-        trayMenu->addAction(new QAction(hostsVector[x].c_str(), trayMenu) );
+        userHostsSubMenu = trayMenu->addMenu(hostsVector[x].c_str());
+        
+        openPuttyButton = new QAction("&Open Putty", userHostsSubMenu);
+        userHostsSubMenu->addAction(openPuttyButton);
+        
+        communityLogsButton = new QAction("&Community Logs", userHostsSubMenu);
+        userHostsSubMenu->addAction(communityLogsButton);
+        
+        //trayMenu->addAction(new QAction(hostsVector[x].c_str(), trayMenu) );
     }
     
     trayMenu->addSeparator();
@@ -112,13 +120,9 @@ void DISH::createMenu()
     
     tailProdButton = new QAction("&Tail production", trayMenu);
     trayMenu->addAction(tailProdButton);
-    
-    
-    
+   
     
     trayMenu->addSeparator();
-    
-    
     
     
     hostsSubmenu = trayMenu->addMenu("&Hosts");
