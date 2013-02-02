@@ -1,5 +1,3 @@
-
-
 #include "DISH.h"
 #include <QApplication>
 #include <iostream>
@@ -10,13 +8,10 @@
 #include <QString>
 #include <QLineEdit>
 #include <string.h>
-#include <QTimer>
-
+#include <QSystemTrayIcon>
 
 using namespace std;
 using namespace boost::filesystem;
-
-
 
 DISH::DISH()
 {
@@ -111,17 +106,15 @@ void DISH::timeOut()
 void DISH::createMenu()
 {
     urlSubmenu = trayMenu->addMenu("URL");
+    urlSubmenu->setFont(QFont ("Arial", 10, QFont::Bold));
 
      
-   changeURLButton = new QAction("&Change URL", urlSubmenu);
+    changeURLButton = new QAction("&Change URL", this);
     urlSubmenu->addAction(changeURLButton);
     QObject::connect(changeURLButton, SIGNAL(triggered()), this, SLOT(changeURL()));
 
     
-    defaultURLButton = new QAction("&Default URL", urlSubmenu);
-    urlSubmenu->addAction(defaultURLButton);
-    
-    clearCacheButton = new QAction("&Clear cache", urlSubmenu);
+    clearCacheButton = new QAction("&Clear cache", this);
     urlSubmenu->addAction(clearCacheButton);
     
     trayMenu->addSeparator();
@@ -131,10 +124,10 @@ void DISH::createMenu()
     {
         userHostsSubMenu = trayMenu->addMenu(hostsVector[x].c_str());
         
-        openPuttyButton = new QAction("&Open Putty", userHostsSubMenu);
+        openPuttyButton = new QAction("&Open Putty", this);
         userHostsSubMenu->addAction(openPuttyButton);
         
-        communityLogsButton = new QAction("&Community Logs", userHostsSubMenu);
+        communityLogsButton = new QAction("&Community Logs", this);
         userHostsSubMenu->addAction(communityLogsButton);
         
         //trayMenu->addAction(new QAction(hostsVector[x].c_str(), trayMenu) );
@@ -142,10 +135,10 @@ void DISH::createMenu()
     
     trayMenu->addSeparator();
 
-    adminButton = new QAction("&Make Spice admin", trayMenu);
+    adminButton = new QAction("&Make Spice admin", this);
     trayMenu->addAction(adminButton);
     
-    tailProdButton = new QAction("&Tail production", trayMenu);
+    tailProdButton = new QAction("&Tail production", this);
     trayMenu->addAction(tailProdButton);
    
     
@@ -154,26 +147,27 @@ void DISH::createMenu()
     
     hostsSubmenu = trayMenu->addMenu("&Hosts");
     
-    editButton = new QAction("&Edit current hosts file", hostsSubmenu);
+    editButton = new QAction("&Edit current hosts file", this);
     hostsSubmenu->addAction(editButton);
     QObject::connect(editButton, SIGNAL(triggered()), this, SLOT(editHosts()));
     
-    newHostsButton = new QAction("&New hosts file", hostsSubmenu);
+    newHostsButton = new QAction("&New hosts file", this);
     hostsSubmenu->addAction(newHostsButton);
     QObject::connect(newHostsButton, SIGNAL(triggered()), this, SLOT(newHosts()));
 
     
-    refreshButton = new QAction("&Refresh", hostsSubmenu);
+    refreshButton = new QAction("&Refresh", this);
     hostsSubmenu->addAction(refreshButton);
     
-    hostsDirButton = new QAction("&Go to hosts file directory", hostsSubmenu);
+    hostsDirButton = new QAction("&Go to hosts file directory", this);
     hostsSubmenu->addAction(hostsDirButton);
     QObject::connect(hostsDirButton, SIGNAL(triggered()), this, SLOT(openHostsDir()));
     
-    messageButton = new QAction("&Message", trayMenu);
+    messageButton = new QAction("&Message", this);
     trayMenu->addAction(messageButton);
     
-    releaseButton = new QAction("&Release", trayMenu);
+    releaseButton = new QAction("&Release", this);
+    releaseButton->setFont(QFont ("Arial", 10, QFont::Bold));
     trayMenu->addAction(releaseButton);
     
     
@@ -227,7 +221,6 @@ void DISH::setIcon()
     
     trayIcon->setIcon(icon);
     trayIcon->setContextMenu(trayMenu);
-//    trayIcon->setToolTip(QString("Tool tip test"));    
 }
 
 DISH::~DISH()
