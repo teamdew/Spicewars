@@ -10,6 +10,8 @@
 #include <QString>
 #include <QLineEdit>
 #include <string.h>
+#include <QTimer>
+
 
 using namespace std;
 using namespace boost::filesystem;
@@ -20,13 +22,32 @@ DISH::DISH()
 {
     trayMenu = new QMenu();
     trayIcon = new QSystemTrayIcon();
+    timer = new QTimer();
     getHostsList();
+    curl = curl_easy_init();
+    trayIcon->show();
+    setIcon();
 }
 
-//bool checkServer() 
-//{    
-//    return true;
-//}
+bool DISH::checkServer() 
+{   
+
+    long http_code;
+    if(curl) {
+        curl_easy_setopt(curl, CURLOPT_URL, "community.spiceworks.com");
+        curl_easy_setopt(curl, CURLOPT_TIMEOUT, 7L);
+        curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+        //maybe we should ask someone how many redirects there are in spiceworks, it depends on the company
+        curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 5L); 
+        curl_easy_perform(curl);
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code);
+    }
+    
+    if ((http_code > 199) && (http_code < 300))
+        return true;
+    else 
+        return false;
+}
 
 //still need to do connect for all of the buttons sans Quit
 //creates the menu
@@ -45,7 +66,7 @@ void DISH::changeURL()
 
 void DISH::editHosts()
 {
-    system("gedit //etc//hosts");
+    system("sudo gedit //etc//hosts");
 }
 
 void DISH::newHosts()
@@ -79,6 +100,12 @@ void DISH::getHostsList()
         if(is_regular_file(itr->status())  && boost::regex_match(itr->path().filename().c_str(), re))
             hostsVector.push_back(itr->path().filename().c_str());
     
+}
+
+void DISH::timeOut()
+{
+    setIcon();
+    QTimer::singleShot(10000, this, SLOT(timeOut()));
 }
 
 void DISH::createMenu()
@@ -153,61 +180,57 @@ void DISH::createMenu()
     
     settingsSubmenu = trayMenu->addMenu("&Settings");
     
-    urlCheckButton = new QAction("&URL", settingsSubmenu);
+    urlCheckButton = new QAction("&URL", this);
     urlCheckButton->setCheckable(true);
     urlCheckButton->setChecked(true);
     settingsSubmenu->addAction(urlCheckButton);
     
-    hostsCheckButton = new QAction("&Hosts files", settingsSubmenu);
+    hostsCheckButton = new QAction("&Hosts files", this);
     hostsCheckButton->setCheckable(true);
     hostsCheckButton->setChecked(true);
     settingsSubmenu->addAction(hostsCheckButton);
     
-    tailProdCheckButton = new QAction("&Tail production", settingsSubmenu);
+    tailProdCheckButton = new QAction("&Tail production", this);
     tailProdCheckButton->setCheckable(true);
     tailProdCheckButton->setChecked(true);
     settingsSubmenu->addAction(tailProdCheckButton);
     
-    messageCheckButton = new QAction("&Message", settingsSubmenu);
+    messageCheckButton = new QAction("&Message", this);
     messageCheckButton->setCheckable(true);
     messageCheckButton->setChecked(true);
     settingsSubmenu->addAction(messageCheckButton);
     
     
-    releaseCheckButton = new QAction("&Release", settingsSubmenu);
+    releaseCheckButton = new QAction("&Release", this);
     releaseCheckButton->setCheckable(true);
     releaseCheckButton->setChecked(true);
     settingsSubmenu->addAction(releaseCheckButton);
     
+    trayIcon->setToolTip("test test");
     
     
-    
-    quit = new QAction("&Quit", trayMenu);
+    quit = new QAction("&Quit", this);
+//    quit->setToolTip(tr("i is quitting?"));
     trayMenu->addAction(quit);
     QObject::connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
+    
+    timeOut();
 }
 
 //sets the tray icon
-void DISH::iconSetup()
+void DISH::setIcon()
 {
-
-    icon = QIcon(WORKING_PEPPER);
-    
-    trayIcon->setIcon(icon);
-    trayIcon->setContextMenu(trayMenu);
-    trayIcon->show();
-    
-}
-
-void DISH::setIcon(bool up)
-{
-    if(up)
+    if(checkServer())
         icon = QIcon(WORKING_PEPPER);
     else
         icon = QIcon(BROKEN_PEPPER);
     
     trayIcon->setIcon(icon);
     trayIcon->setContextMenu(trayMenu);
-    trayIcon->show();
-        
+//    trayIcon->setToolTip(QString("Tool tip test"));    
+}
+
+DISH::~DISH()
+{
+    curl_easy_cleanup(curl);
 }

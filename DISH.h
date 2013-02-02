@@ -9,6 +9,8 @@
 #include <QSystemTrayIcon>
 #include <QDialog>
 #include <dialog.h>
+#include <curl/curl.h>
+#include <QTimer>
 
 using namespace std;
 
@@ -24,18 +26,25 @@ class DISH : public QDialog{
        
        public:
                 DISH();
+                ~DISH();
 //                bool checkServer();
                 void createMenu();
-                void iconSetup();
                 QIcon icon;
+                
         
        private slots:
+//                void serverTimeOut();
+                void timeOut();
                 void changeURL(); 
                 void editHosts();
                 void newHosts();
                 void openHostsDir();
                 
+                
+                
        private:
+                CURL *curl;
+                
                 vector<string> hostsVector;
                 QMenu *trayMenu;
                 QSystemTrayIcon *trayIcon;
@@ -68,10 +77,10 @@ class DISH : public QDialog{
                 QAction *releaseCheckButton;
                 
                 QAction *quit;
-                void setIcon(bool up);
+                void setIcon();
                 void getHostsList();
-                
-        
+                bool checkServer();
+                QTimer *timer;        
                         
                 
                 
