@@ -27,13 +27,11 @@ class DISH : public QDialog{
        public:
                 DISH();
                 ~DISH();
-//                bool checkServer();
                 void createMenu();
                 QIcon icon;
                 
         
        private slots:
-//                void serverTimeOut();
                 void timeOut();
                 void changeURL(); 
                 void editHosts();
