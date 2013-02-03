@@ -37,6 +37,7 @@ class DISH : public QDialog{
                 void editHosts();
                 void newHosts();
                 void openHostsDir();
+                void settings();
                 
                 
                 
@@ -67,7 +68,7 @@ class DISH : public QDialog{
                 QAction *messageButton;
                 QAction *releaseButton;
                 
-                QMenu *settingsSubmenu;
+                QAction *settingsButton;
                 QAction *urlCheckButton;
                 QAction *hostsCheckButton;
                 QAction *tailProdCheckButton;

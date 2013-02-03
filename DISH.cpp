@@ -20,8 +20,8 @@ DISH::DISH()
     timer = new QTimer();
     getHostsList();
     curl = curl_easy_init();
-    trayIcon->show();
     setIcon();
+    trayIcon->show();
 }
 
 bool DISH::checkServer() 
@@ -49,12 +49,11 @@ bool DISH::checkServer()
 
 void DISH::changeURL()
 {
-    string urlCall = "url";
-    dialog urlDialog(urlCall);
+    urlDialog showUrlDialog;
     
-    if (urlDialog.exec())
+    if (showUrlDialog.exec())
     {
-        QString url = urlDialog.urlText->text();
+        QString url = showUrlDialog.urlText->text();
         cout << url.toStdString();
     }
 }
@@ -66,12 +65,11 @@ void DISH::editHosts()
 
 void DISH::newHosts()
 {
-    string hosts = "hosts";
-    dialog hostsDialog(hosts);
+    newHostsDialog showHostsFileDialog;
     
-    if (hostsDialog.exec())
+    if (showHostsFileDialog.exec())
     {
-        QString fileName = hostsDialog.fileNameText->text();
+        QString fileName = showHostsFileDialog.fileNameText->text();
         cout << fileName.toStdString();
         
         string command = "sudo gedit //etc//" + fileName.toStdString();
@@ -95,6 +93,16 @@ void DISH::getHostsList()
         if(is_regular_file(itr->status())  && boost::regex_match(itr->path().filename().c_str(), re))
             hostsVector.push_back(itr->path().filename().c_str());
     
+}
+
+void DISH::settings()
+{
+    settingsDialog showSettingsDialog;
+    
+    if (showSettingsDialog.exec())
+    {
+        cout << "SETTINGS" << endl;
+    }
 }
 
 void DISH::timeOut()
@@ -136,14 +144,7 @@ void DISH::createMenu()
     trayMenu->addSeparator();
 
     adminButton = new QAction("&Make Spice admin", this);
-    trayMenu->addAction(adminButton);
-    
-    tailProdButton = new QAction("&Tail production", this);
-    trayMenu->addAction(tailProdButton);
-   
-    
-    trayMenu->addSeparator();
-    
+    trayMenu->addAction(adminButton); 
     
     hostsSubmenu = trayMenu->addMenu("&Hosts");
     
@@ -162,7 +163,14 @@ void DISH::createMenu()
     hostsDirButton = new QAction("&Go to hosts file directory", this);
     hostsSubmenu->addAction(hostsDirButton);
     QObject::connect(hostsDirButton, SIGNAL(triggered()), this, SLOT(openHostsDir()));
+ 
     
+    
+    trayMenu->addSeparator();
+    
+    tailProdButton = new QAction("&Tail production", this);
+    trayMenu->addAction(tailProdButton);
+
     messageButton = new QAction("&Message", this);
     trayMenu->addAction(messageButton);
     
@@ -172,33 +180,35 @@ void DISH::createMenu()
     
     
     
-    settingsSubmenu = trayMenu->addMenu("&Settings");
+    settingsButton = new QAction("&Settings", this);
+    trayMenu->addAction(settingsButton);
+    QObject::connect(settingsButton, SIGNAL(triggered()), this, SLOT(settings()));
     
-    urlCheckButton = new QAction("&URL", this);
-    urlCheckButton->setCheckable(true);
-    urlCheckButton->setChecked(true);
-    settingsSubmenu->addAction(urlCheckButton);
-    
-    hostsCheckButton = new QAction("&Hosts files", this);
-    hostsCheckButton->setCheckable(true);
-    hostsCheckButton->setChecked(true);
-    settingsSubmenu->addAction(hostsCheckButton);
-    
-    tailProdCheckButton = new QAction("&Tail production", this);
-    tailProdCheckButton->setCheckable(true);
-    tailProdCheckButton->setChecked(true);
-    settingsSubmenu->addAction(tailProdCheckButton);
-    
-    messageCheckButton = new QAction("&Message", this);
-    messageCheckButton->setCheckable(true);
-    messageCheckButton->setChecked(true);
-    settingsSubmenu->addAction(messageCheckButton);
-    
-    
-    releaseCheckButton = new QAction("&Release", this);
-    releaseCheckButton->setCheckable(true);
-    releaseCheckButton->setChecked(true);
-    settingsSubmenu->addAction(releaseCheckButton);
+//    urlCheckButton = new QAction("&URL", this);
+//    urlCheckButton->setCheckable(true);
+//    urlCheckButton->setChecked(true);
+//    settingsSubmenu->addAction(urlCheckButton);
+//    
+//    hostsCheckButton = new QAction("&Hosts files", this);
+//    hostsCheckButton->setCheckable(true);
+//    hostsCheckButton->setChecked(true);
+//    settingsSubmenu->addAction(hostsCheckButton);
+//    
+//    tailProdCheckButton = new QAction("&Production Logs", this);
+//    tailProdCheckButton->setCheckable(true);
+//    tailProdCheckButton->setChecked(true);
+//    settingsSubmenu->addAction(tailProdCheckButton);
+//    
+//    messageCheckButton = new QAction("&Message", this);
+//    messageCheckButton->setCheckable(true);
+//    messageCheckButton->setChecked(true);
+//    settingsSubmenu->addAction(messageCheckButton);
+//    
+//    
+//    releaseCheckButton = new QAction("&Release", this);
+//    releaseCheckButton->setCheckable(true);
+//    releaseCheckButton->setChecked(true);
+//    settingsSubmenu->addAction(releaseCheckButton);
     
     trayIcon->setToolTip("test test");
     
