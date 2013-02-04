@@ -13,12 +13,11 @@ int main(int argc, char *argv[]) {
     // Q_INIT_RESOURCE(resfile);
 
     QApplication app(argc, argv);
-
+    app.setQuitOnLastWindowClosed(false);
     // create and show your widgets here
     //return 0;
     
     DISH d;
     d.createMenu();
-    d.iconSetup();
     return app.exec();
 }

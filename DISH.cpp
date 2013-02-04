@@ -19,6 +19,7 @@ using namespace boost::filesystem;
 DISH::DISH()
 {
     trayMenu = new QMenu();
+    trayMenu->setSeparatorsCollapsible(true);
     trayIcon = new QSystemTrayIcon();
     timer = new QTimer();
     getHostsList();
@@ -99,6 +100,21 @@ void DISH::getHostsList()
     
 }
 
+void DISH::toggleMenu(QCheckBox* checkBox, QMenu* menu)
+{
+    if(checkBox->isChecked())
+        menu->menuAction()->setVisible(true);
+    else
+        menu->menuAction()->setVisible(false);
+}
+
+void DISH::toggleAction(QCheckBox *checkBox, QAction* action)
+{
+    if(checkBox->isChecked())
+        action->setVisible(true);
+    else
+        action->setVisible(false);
+}
 
 void DISH::settings()
 {
@@ -106,7 +122,27 @@ void DISH::settings()
     
     if (showSettingsDialog.exec())
     {
-        cout << "SETTINGS" << endl;
+        if (showSettingsDialog.updated == true)
+        {
+            toggleMenu(showSettingsDialog.urlCheckBox, urlSubmenu);
+            toggleAction(showSettingsDialog.urlCheckBox, separatorsVector[0]);
+
+            toggleAction(showSettingsDialog.hostsFilesCheckBox, separatorsVector[1]);
+            
+            for (unsigned int x = 0; x < hostsQmenusVector.size(); x++)
+            {
+                toggleMenu(showSettingsDialog.hostsFilesCheckBox, hostsQmenusVector[x]);
+            }
+            toggleAction(showSettingsDialog.hostsFilesCheckBox,  separatorsVector[2]);
+            toggleAction(showSettingsDialog.hostsFilesCheckBox, adminButton);
+            toggleMenu(showSettingsDialog.hostsFilesCheckBox, hostsSubmenu);
+                
+            toggleAction(showSettingsDialog.prodLogCheckBox, tailProdButton);
+
+            toggleAction(showSettingsDialog.messageCheckBox, messageButton);
+            
+            toggleAction(showSettingsDialog.releaseCheckBox, releaseButton);
+        }
     }
 }
 
@@ -182,12 +218,13 @@ void DISH::createMenu()
     clearCacheButton = new QAction("&Clear cache", this);
     urlSubmenu->addAction(clearCacheButton);
     
-    trayMenu->addSeparator();
+    separatorsVector.push_back(trayMenu->addSeparator());
     
 
     for (unsigned int x = 0; x < hostsVector.size(); x++)
     {
         userHostsSubMenu = trayMenu->addMenu(hostsVector[x].c_str());
+        hostsQmenusVector.push_back(userHostsSubMenu);
         
         openPuttyButton = new QAction("&Open Putty", this);
         userHostsSubMenu->addAction(openPuttyButton);
@@ -200,7 +237,7 @@ void DISH::createMenu()
  
     }
     
-    trayMenu->addSeparator();
+    separatorsVector.push_back(trayMenu->addSeparator());
 
     adminButton = new QAction("&Make Spice admin", this);
     trayMenu->addAction(adminButton); 
@@ -223,9 +260,8 @@ void DISH::createMenu()
     hostsSubmenu->addAction(hostsDirButton);
     QObject::connect(hostsDirButton, SIGNAL(triggered()), this, SLOT(openHostsDir()));
  
-    
-    
-    trayMenu->addSeparator();
+     
+    separatorsVector.push_back(trayMenu->addSeparator());
     
     tailProdButton = new QAction("&Tail production", this);
     trayMenu->addAction(tailProdButton);
@@ -243,31 +279,6 @@ void DISH::createMenu()
     trayMenu->addAction(settingsButton);
     QObject::connect(settingsButton, SIGNAL(triggered()), this, SLOT(settings()));
     
-//    urlCheckButton = new QAction("&URL", this);
-//    urlCheckButton->setCheckable(true);
-//    urlCheckButton->setChecked(true);
-//    settingsSubmenu->addAction(urlCheckButton);
-//    
-//    hostsCheckButton = new QAction("&Hosts files", this);
-//    hostsCheckButton->setCheckable(true);
-//    hostsCheckButton->setChecked(true);
-//    settingsSubmenu->addAction(hostsCheckButton);
-//    
-//    tailProdCheckButton = new QAction("&Production Logs", this);
-//    tailProdCheckButton->setCheckable(true);
-//    tailProdCheckButton->setChecked(true);
-//    settingsSubmenu->addAction(tailProdCheckButton);
-//    
-//    messageCheckButton = new QAction("&Message", this);
-//    messageCheckButton->setCheckable(true);
-//    messageCheckButton->setChecked(true);
-//    settingsSubmenu->addAction(messageCheckButton);
-//    
-//    
-//    releaseCheckButton = new QAction("&Release", this);
-//    releaseCheckButton->setCheckable(true);
-//    releaseCheckButton->setChecked(true);
-//    settingsSubmenu->addAction(releaseCheckButton);
     
     trayIcon->setToolTip("test test");
     

@@ -48,6 +48,9 @@ class DISH : public QDialog{
                 CURL *curl;
                 
                 vector<string> hostsVector;
+                vector<QMenu*> hostsQmenusVector;
+                vector<QAction*> separatorsVector;
+                
                 QMenu *trayMenu;
                 QSystemTrayIcon *trayIcon;
                 string username;
@@ -87,6 +90,9 @@ class DISH : public QDialog{
                 QTimer *timer;        
                 void getCredentials();
                 string parseFile(string location, boost::regex re);
+                void toggleMenu(QCheckBox*, QMenu*);   
+                void toggleAction(QCheckBox*, QAction*);
+                
                 
         
                         

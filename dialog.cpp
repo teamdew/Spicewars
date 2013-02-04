@@ -1,15 +1,21 @@
-
-
 #include <QtGui>
 #include "dialog.h"
 #include <QLineEdit>
-#include <string>
-#include <iostream>
 
 using namespace std;
 
 //
 //using namespace std;
+
+void urlDialog::changeURL()
+{
+    
+}
+
+void urlDialog::doNothing()
+{
+    QDialog::setVisible(false);
+}
 
 //dialog for changing URL
 urlDialog::urlDialog() 
@@ -42,8 +48,18 @@ urlDialog::urlDialog()
             this, SLOT(accept()));
 
     connect(cancelButton, SIGNAL(clicked()),
-            this, SLOT(reject()));
+            this, SLOT(doNothing()));
 
+}
+
+void newHostsDialog::makeNewHostsFile()
+{
+    
+}
+
+void newHostsDialog::doNothing()
+{
+    QDialog::setVisible(false);
 }
 
 //dialog for a new hosts file
@@ -79,7 +95,17 @@ newHostsDialog::newHostsDialog()
     connect(cancelButton, SIGNAL(clicked()),
             this, SLOT(reject()));
 }
+
+void spiceAdminDialog::runSpiceAdminScript()
+{
+    
+}
  
+void spiceAdminDialog::doNothing()
+{
+    QDialog::setVisible(false);
+}
+
 //dialog for making a spice admin
 spiceAdminDialog::spiceAdminDialog(bool hasCred) 
 {
@@ -140,18 +166,43 @@ spiceAdminDialog::spiceAdminDialog(bool hasCred)
      setWindowTitle("Make a Spice admin");
 }
 
+void settingsDialog::updateMenu()
+{
+    
+    this->setVisible(false);
+    updated = true;
+    QDialog::accept();
+}
+
+void settingsDialog::doNothing()
+{
+    this->setVisible(false);
+    updated = false;
+    QDialog::accept();
+}
+
+void settingsDialog::deleteCreds()
+{
+    
+}
+
 settingsDialog::settingsDialog() 
 {
     QGridLayout *gLayout = new QGridLayout;
     QVBoxLayout *showHideLayout = new QVBoxLayout;
     QGridLayout *credentialsLayout = new QGridLayout;
     
-    showHideGroup = new QGroupBox(tr("Show/Hide these spicy options"));
+    showHideGroup = new QGroupBox(tr("Show/hide these spicy options"));
     urlCheckBox = new QCheckBox("URL");
-    hostsFilesCheckBox = new QCheckBox(tr("Hosts files"));
-    prodLogCheckBox = new QCheckBox(tr("Production Logs"));
-    messageCheckBox = new QCheckBox(tr("Message"));
-    releaseCheckBox = new QCheckBox(tr("Release"));
+    urlCheckBox->setCheckState(Qt::Checked);
+    hostsFilesCheckBox = new QCheckBox("Hosts files");
+    hostsFilesCheckBox->setCheckState(Qt::Checked);
+    prodLogCheckBox = new QCheckBox("Production Logs");
+    prodLogCheckBox->setCheckState(Qt::Checked);
+    messageCheckBox = new QCheckBox("Message");
+    messageCheckBox->setCheckState(Qt::Checked);
+    releaseCheckBox = new QCheckBox("Release");
+    releaseCheckBox->setCheckState(Qt::Checked);
     saveButton = new QPushButton("Save");
     cancelButton = new QPushButton("Cancel");
     
@@ -169,7 +220,7 @@ settingsDialog::settingsDialog()
     usernameText = new QLineEdit;
     passwordText = new QLineEdit;
     passwordText->setEchoMode(QLineEdit::Password);
-    removeButton = new QPushButton("Clear");
+    removeButton = new QPushButton("Remove credentials from DISH");
     
     credentialsLayout->addWidget(usernameLabel, 0, 0);
     credentialsLayout->addWidget(usernameText, 0, 1);
@@ -187,12 +238,15 @@ settingsDialog::settingsDialog()
     QVBoxLayout *mainLayout = new QVBoxLayout;
     mainLayout->addLayout(gLayout);
     setLayout(mainLayout);
+    
+    connect(removeButton, SIGNAL(clicked()),
+            this, SLOT(deleteCreds()));
 
     connect(saveButton, SIGNAL(clicked()),
-            this, SLOT(accept()));
+            this, SLOT(updateMenu()));
 
     connect(cancelButton, SIGNAL(clicked()),
-            this, SLOT(reject()));
+            this, SLOT(doNothing()));
 
     setWindowTitle("SuperSpicyFragilitstic Settings");
 }

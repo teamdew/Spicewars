@@ -10,7 +10,6 @@
 
 #include <QDialog>
 #include <QCheckBox>
-#include <string>
 #include <QGroupBox>
 
 using namespace std;
@@ -22,68 +21,89 @@ class QLineEdit;
 
 class urlDialog : public QDialog
 {
-    Q_OBJECT
-public:
-    urlDialog();
-    QLineEdit *urlText;
+    Q_OBJECT;
 
-private:
-    QLabel *urlLabel;
-    QPushButton *okButton;
-    QPushButton *cancelButton;
+    public:
+        urlDialog();
+        QLineEdit *urlText;
+        
+    private slots:
+        void changeURL();
+        void doNothing();
+
+    private:
+        QLabel *urlLabel;
+        QPushButton *okButton;
+        QPushButton *cancelButton;
 };
 
 class newHostsDialog : public QDialog
 {
-    Q_OBJECT
-public:
-    newHostsDialog();
-    QLineEdit *fileNameText;
+    Q_OBJECT;
+    public:
+        newHostsDialog();
+        QLineEdit *fileNameText;
+        
+    private slots:
+        void makeNewHostsFile();
+        void doNothing();
 
-private:
-    QLabel *fileNameLabel;
-    QPushButton *okButton;
-    QPushButton *cancelButton;   
+    private:
+        QLabel *fileNameLabel;
+        QPushButton *okButton;
+        QPushButton *cancelButton;   
 };
  
 class spiceAdminDialog : public QDialog
 {
-    Q_OBJECT
-public:
-    spiceAdminDialog(bool);
-    QLineEdit *usernameText;
-    QLineEdit *passwordText;
-    QLineEdit *emailText;
-
-private:
-    QLabel *usernameLabel;
-    QLabel *passwordLabel;
-    QLabel *emailLabel;
-    QPushButton *okButton;
-    QPushButton *cancelButton;  
+    Q_OBJECT;
+    
+    public:
+        spiceAdminDialog(bool);
+        QLineEdit *usernameText;
+        QLineEdit *passwordText;
+        QLineEdit *emailText;
+    
+    private slots:
+        void runSpiceAdminScript();
+        void doNothing();
+        
+    private:
+        QLabel *usernameLabel;
+        QLabel *passwordLabel;
+        QLabel *emailLabel;
+        QPushButton *okButton;
+        QPushButton *cancelButton;  
 };
  
 class settingsDialog : public QDialog
 {
-    Q_OBJECT
-public:
-    settingsDialog();
-    QLineEdit *usernameText;
-    QLineEdit *passwordText;
+    Q_OBJECT;
+    
+    public:
+        settingsDialog();
+        QLineEdit *usernameText;
+        QLineEdit *passwordText;
+        QCheckBox *urlCheckBox;
+        QCheckBox *hostsFilesCheckBox;
+        QCheckBox *prodLogCheckBox;
+        QCheckBox *messageCheckBox;
+        QCheckBox *releaseCheckBox;
+        bool updated;
+    
+    private slots:
+        void updateMenu();
+        void doNothing();
+        void deleteCreds();
 
-private:
-    QLabel *usernameLabel;
-    QLabel *passwordLabel;
-    QPushButton *saveButton;
-    QPushButton *cancelButton;
-    QPushButton *removeButton;
-    QCheckBox *urlCheckBox;
-    QCheckBox *hostsFilesCheckBox;
-    QCheckBox *prodLogCheckBox;
-    QCheckBox *messageCheckBox;
-    QCheckBox *releaseCheckBox;
-    QGroupBox *showHideGroup;
-    QGroupBox *credentialsGroup;
+    private:
+        QLabel *usernameLabel;
+        QLabel *passwordLabel;
+        QPushButton *saveButton;
+        QPushButton *cancelButton;
+        QPushButton *removeButton;
+        QGroupBox *showHideGroup;
+        QGroupBox *credentialsGroup;
     
 };
 
