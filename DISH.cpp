@@ -9,8 +9,11 @@
 #include <QLineEdit>
 #include <string.h>
 #include <QSystemTrayIcon>
+#include <boost/algorithm/string.hpp>
+
 
 using namespace std;
+//using namespace boost;
 using namespace boost::filesystem;
 
 DISH::DISH()
@@ -22,6 +25,7 @@ DISH::DISH()
     curl = curl_easy_init();
     setIcon();
     trayIcon->show();
+    getCredentials();
 }
 
 bool DISH::checkServer() 
@@ -95,6 +99,7 @@ void DISH::getHostsList()
     
 }
 
+
 void DISH::settings()
 {
     settingsDialog showSettingsDialog;
@@ -109,6 +114,58 @@ void DISH::timeOut()
 {
     setIcon();
     QTimer::singleShot(10000, this, SLOT(timeOut()));
+}
+
+void DISH::openPutty()
+{ 
+    string input = parseFile(CURRENT_HOST, boost::regex(".*community.*"));
+    vector<string> parsed;
+    boost::split(parsed, input, boost::is_any_of(" "));
+    string command = "putty -ssh -l " + username + " -pw " + password + " " + parsed[0];
+    
+    system(command.c_str());
+}
+
+void DISH::openCommunityLogs()
+{
+    string input = parseFile(CURRENT_HOST, boost::regex(".*community.*"));
+    vector<string> parsed;
+    boost::split(parsed, input, boost::is_any_of(" "));
+    string command = "putty -ssh -l " + username + " -pw " + password + " " + parsed[0] + " -t -m scripts//tail.sh";
+
+    system(command.c_str());
+    
+}
+
+void DISH::getCredentials()
+{
+     string input = parseFile(CONFIG, boost::regex("putty username.*"));
+     
+     vector<string> parsed;
+     boost::split(parsed, input, boost::is_any_of(" "));
+     username = parsed.at(parsed.size() - 1);
+     
+    input = parseFile(CONFIG, boost::regex("putty password.*"));
+     
+     boost::split(parsed, input, boost::is_any_of(" "));
+     password = parsed.at(parsed.size() - 1);
+}
+
+string DISH::parseFile(string location, boost::regex re)
+{
+    ifstream myFile(location.c_str());
+    string input;
+    bool found = false;
+    
+    while(!found && getline(myFile, input))
+    {
+            if(boost::regex_match(input, re))
+            found = true;
+    }
+    
+    return input;
+    
+
 }
 
 void DISH::createMenu()
@@ -134,11 +191,13 @@ void DISH::createMenu()
         
         openPuttyButton = new QAction("&Open Putty", this);
         userHostsSubMenu->addAction(openPuttyButton);
+        QObject::connect(openPuttyButton, SIGNAL(triggered()), this, SLOT(openPutty()));
         
         communityLogsButton = new QAction("&Community Logs", this);
         userHostsSubMenu->addAction(communityLogsButton);
+        QObject::connect(communityLogsButton, SIGNAL(triggered()), this, SLOT(openCommunityLogs()));
         
-        //trayMenu->addAction(new QAction(hostsVector[x].c_str(), trayMenu) );
+ 
     }
     
     trayMenu->addSeparator();

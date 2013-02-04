@@ -2,14 +2,14 @@
 # Use project properties -> Build -> Qt -> Expert -> Custom Definitions.
 TEMPLATE = app
 DESTDIR = dist/Release/GNU-Linux-x86
-TARGET = Spicewars
+TARGET = DISH
 VERSION = 1.0.0
 CONFIG -= debug_and_release app_bundle lib_bundle
 CONFIG += release 
 PKGCONFIG +=
 QT = core gui
-SOURCES += main.cpp DISH.cpp
-HEADERS += DISH.h
+SOURCES += main.cpp DISH.cpp dialog.cpp
+HEADERS += DISH.h dialog.h
 FORMS +=
 RESOURCES +=
 TRANSLATIONS +=

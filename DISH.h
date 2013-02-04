@@ -3,14 +3,17 @@
 //#define HOSTS_DIR "C:\\Windows\\System32\\drivers\\etc\\hosts"
 //if testing on a linux box use this instead
 #define HOSTS_DIR "//etc"
+#define CURRENT_HOST "//etc//hosts"
 #define WORKING_PEPPER "pepper-icon.png"
 #define BROKEN_PEPPER "broken-pepper-icon.png"
+#define CONFIG "config"
 #include <QMenu>
 #include <QSystemTrayIcon>
 #include <QDialog>
 #include <dialog.h>
 #include <curl/curl.h>
 #include <QTimer>
+#include <boost/regex.hpp>
 
 using namespace std;
 
@@ -37,9 +40,9 @@ class DISH : public QDialog{
                 void editHosts();
                 void newHosts();
                 void openHostsDir();
-                void settings();
-                
-                
+                void settings();            
+                void openPutty();
+                void openCommunityLogs();
                 
        private:
                 CURL *curl;
@@ -47,6 +50,8 @@ class DISH : public QDialog{
                 vector<string> hostsVector;
                 QMenu *trayMenu;
                 QSystemTrayIcon *trayIcon;
+                string username;
+                string password;
                 
                 QMenu *urlSubmenu;
                 QAction *changeURLButton;
@@ -80,6 +85,10 @@ class DISH : public QDialog{
                 void getHostsList();
                 bool checkServer();
                 QTimer *timer;        
+                void getCredentials();
+                string parseFile(string location, boost::regex re);
+                
+        
                         
                 
                 
