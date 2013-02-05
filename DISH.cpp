@@ -204,6 +204,17 @@ string DISH::parseFile(string location, boost::regex re)
 
 }
 
+void DISH::makeSpiceAdmin()
+{
+    string input = parseFile(CURRENT_HOST, boost::regex(".*community.*"));
+    vector<string> parsed;
+    boost::split(parsed, input, boost::is_any_of(" ")); 
+    
+    string command = "putty -ssh -l " + username + " -pw " + password + " " + parsed[0] + " -t -m scripts//spiceadmin.sh";
+    
+    system(command.c_str());
+}
+
 void DISH::createMenu()
 {
     urlSubmenu = trayMenu->addMenu("URL");
@@ -240,7 +251,8 @@ void DISH::createMenu()
     separatorsVector.push_back(trayMenu->addSeparator());
 
     adminButton = new QAction("&Make Spice admin", this);
-    trayMenu->addAction(adminButton); 
+    trayMenu->addAction(adminButton);
+    QObject::connect(adminButton, SIGNAL(triggered()), this, SLOT(makeSpiceAdmin()));
     
     hostsSubmenu = trayMenu->addMenu("&Hosts");
     

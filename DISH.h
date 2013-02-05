@@ -43,6 +43,9 @@ class DISH : public QDialog{
                 void settings();            
                 void openPutty();
                 void openCommunityLogs();
+                void makeSpiceAdmin();
+                
+                
                 
        private:
                 CURL *curl;
@@ -92,6 +95,7 @@ class DISH : public QDialog{
                 string parseFile(string location, boost::regex re);
                 void toggleMenu(QCheckBox*, QMenu*);   
                 void toggleAction(QCheckBox*, QAction*);
+                
                 
                 
         
