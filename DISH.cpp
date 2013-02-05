@@ -23,6 +23,7 @@ DISH::DISH()
     trayIcon = new QSystemTrayIcon();
     timer = new QTimer();
     getHostsList();
+    findCurrentHosts();
     curl = curl_easy_init();
     setIcon();
     trayIcon->show();
@@ -48,9 +49,6 @@ bool DISH::checkServer()
     else 
         return false;
 }
-
-//still need to do connect for all of the buttons sans Quit
-//creates the menu
 
 void DISH::changeURL()
 {
@@ -83,6 +81,67 @@ void DISH::newHosts()
     }
 }
 
+bool DISH::compareFile(FILE* file_compared, FILE* file_checked)
+{
+    bool diff = 0;
+    int N = 65536;
+    char* b1 = (char*) calloc (1, N+1);
+    char* b2 = (char*) calloc (1, N+1);
+    size_t s1, s2;
+
+    do {
+        s1 = fread(b1, 1, N, file_compared);
+        s2 = fread(b2, 1, N, file_checked);
+        
+        if (s1 != s2 || memcmp(b1, b2, s1)) {
+            diff = 1;
+            break;
+        }
+      } while (!feof(file_compared) || !feof(file_checked));
+
+    free(b1);
+    free(b2);
+    
+    cout << "diff " << diff << endl;
+
+    if (diff) return false;
+    else return true;
+}
+
+void DISH::findCurrentHosts()
+{
+    FILE * mainHosts = fopen(MAIN_HOSTS, "r");
+    FILE * currentHosts;
+    bool foundMatch = false;
+    string fileLocation;
+    
+    for (unsigned int x = 0; x < hostsVector.size(); x++)
+    {
+        fileLocation = HOSTS_DIR + hostsVector[x];
+        currentHosts = fopen(fileLocation.c_str(), "r");
+        if(compareFile(mainHosts, currentHosts))
+        {
+            currentHostsFileName = hostsVector[x];
+            foundMatch = true;
+            break;
+        }
+        fclose(currentHosts);
+    }
+    if (foundMatch == false)
+        currentHostsFileName = "hosts.backup";
+    fclose(mainHosts);
+}
+
+void DISH::changeHosts(const QString &hostsName)
+{
+    path mainHosts = MAIN_HOSTS;
+    path currentHosts = HOSTS_DIR + currentHostsFileName;
+    path newHosts = HOSTS_DIR + hostsName.toStdString();
+    
+//    boost::filesystem3::copy_file(mainHosts, currentHosts, copy_option::overwrite_if_exists);
+//    boost::filesystem3::copy_file(newHosts, mainHosts, copy_option::overwrite_if_exists);
+}
+
 void DISH::openHostsDir()
 {
     system("gnome-open //etc");
@@ -92,12 +151,12 @@ void DISH::getHostsList()
 {
     path dir_path = path (HOSTS_DIR);
     directory_iterator end_itr;
-    boost::regex re("^hosts.*");
+    //prevents matches for hosts, hosts~ (or any other modiefied hosts,, hosts.deny and hosts.allow
+    boost::regex re("^hosts\.(?![allow]|[deny]).*(?<!~)$");
 
     for (directory_iterator itr(dir_path); itr != end_itr; ++itr)
         if(is_regular_file(itr->status())  && boost::regex_match(itr->path().filename().c_str(), re))
             hostsVector.push_back(itr->path().filename().c_str());
-    
 }
 
 void DISH::toggleMenu(QCheckBox* checkBox, QMenu* menu)
@@ -154,7 +213,7 @@ void DISH::timeOut()
 
 void DISH::openPutty()
 { 
-    string input = parseFile(CURRENT_HOST, boost::regex(".*community.*"));
+    string input = parseFile(MAIN_HOSTS, boost::regex(".*community.*"));
     vector<string> parsed;
     boost::split(parsed, input, boost::is_any_of(" "));
     string command = "putty -ssh -l " + username + " -pw " + password + " " + parsed[0];
@@ -164,7 +223,7 @@ void DISH::openPutty()
 
 void DISH::openCommunityLogs()
 {
-    string input = parseFile(CURRENT_HOST, boost::regex(".*community.*"));
+    string input = parseFile(MAIN_HOSTS, boost::regex(".*community.*"));
     vector<string> parsed;
     boost::split(parsed, input, boost::is_any_of(" "));
     string command = "putty -ssh -l " + username + " -pw " + password + " " + parsed[0] + " -t -m scripts//tail.sh";
@@ -200,8 +259,6 @@ string DISH::parseFile(string location, boost::regex re)
     }
     
     return input;
-    
-
 }
 
 void DISH::makeSpiceAdmin()
@@ -253,7 +310,18 @@ void DISH::createMenu()
         userHostsSubMenu->addAction(communityLogsButton);
         QObject::connect(communityLogsButton, SIGNAL(triggered()), this, SLOT(openCommunityLogs()));
         
- 
+        string hostsFileName = hostsVector[x];
+        cout << "hi " << hostsFileName << endl;
+        string hostsFileButtonTitle = "&Switch to " + hostsFileName.substr(6, hostsFileName.length());
+        cout << "edited " << hostsFileName << endl;
+        cout << "vector " << hostsVector[x] << endl;
+        
+        mapper = new QSignalMapper(this);        
+        changeHostsButton = new QAction(hostsFileButtonTitle.c_str(), this);
+        mapper->setMapping(changeHostsButton, hostsFileName.c_str()); 
+        connect(changeHostsButton, SIGNAL(triggered()), mapper, SLOT(map()));
+        userHostsSubMenu->addAction(changeHostsButton);
+        connect(mapper, SIGNAL(mapped(const QString &)), SLOT(changeHosts(const QString &)));
     }
     
     separatorsVector.push_back(trayMenu->addSeparator());
@@ -304,7 +372,6 @@ void DISH::createMenu()
     
     
     quit = new QAction("&Quit", this);
-//    quit->setToolTip(tr("i is quitting?"));
     trayMenu->addAction(quit);
     QObject::connect(quit, SIGNAL(triggered()), qApp, SLOT(quit()));
     
@@ -320,6 +387,7 @@ void DISH::setIcon()
         icon = QIcon(BROKEN_PEPPER);
     
     trayIcon->setIcon(icon);
+    trayIcon->setToolTip(tr("toopTIP"));
     trayIcon->setContextMenu(trayMenu);
 }
 

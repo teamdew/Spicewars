@@ -2,8 +2,8 @@
 #define DISH_H
 //#define HOSTS_DIR "C:\\Windows\\System32\\drivers\\etc\\hosts"
 //if testing on a linux box use this instead
-#define HOSTS_DIR "//etc"
-#define CURRENT_HOST "//etc//hosts"
+#define HOSTS_DIR "//etc//"
+#define MAIN_HOSTS "//etc//hosts"
 #define WORKING_PEPPER "pepper-icon.png"
 #define BROKEN_PEPPER "broken-pepper-icon.png"
 #define CONFIG "config"
@@ -14,6 +14,7 @@
 #include <curl/curl.h>
 #include <QTimer>
 #include <boost/regex.hpp>
+#include <QSignalMapper>
 
 using namespace std;
 
@@ -39,11 +40,14 @@ class DISH : public QDialog{
                 void changeURL(); 
                 void editHosts();
                 void newHosts();
+//                void triggered(const QString &);
+                void changeHosts(const QString &);
                 void openHostsDir();
                 void settings();            
                 void openPutty();
                 void openCommunityLogs();
                 void makeSpiceAdmin();
+                
                 
                 
                 
@@ -58,6 +62,7 @@ class DISH : public QDialog{
                 QSystemTrayIcon *trayIcon;
                 string username;
                 string password;
+                string currentHostsFileName;
                 
                 QMenu *urlSubmenu;
                 QAction *changeURLButton;
@@ -67,6 +72,8 @@ class DISH : public QDialog{
                 QMenu *userHostsSubMenu;
                 QAction *openPuttyButton;
                 QAction *communityLogsButton;
+                QAction *changeHostsButton;
+                QSignalMapper *mapper;
                 
                 QAction *adminButton;
                 QAction *tailProdButton;
@@ -93,10 +100,12 @@ class DISH : public QDialog{
                 QTimer *timer;        
                 void getCredentials();
                 string parseFile(string location, boost::regex re);
-                void toggleMenu(QCheckBox*, QMenu*);   
+                void findCurrentsHosts();
+                bool compareFile(FILE*, FILE*);
+                void toggleMenu(QCheckBox*, QMenu*);  
+                void findCurrentHosts();
                 void toggleAction(QCheckBox*, QAction*);
                 void flushCache();
-                
                 
                 
         
