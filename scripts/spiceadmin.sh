@@ -1,5 +1,4 @@
-echo "Type the email of the user you would like to make a 
-Spice Admin, followed by [ENTER]:"
+echo "Type the email of the user you would like to make a Spice Admin, followed by [ENTER]:"
 
 read user
 

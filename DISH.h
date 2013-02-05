@@ -95,6 +95,7 @@ class DISH : public QDialog{
                 string parseFile(string location, boost::regex re);
                 void toggleMenu(QCheckBox*, QMenu*);   
                 void toggleAction(QCheckBox*, QAction*);
+                void flushCache();
                 
                 
                 

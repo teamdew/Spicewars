@@ -206,6 +206,7 @@ string DISH::parseFile(string location, boost::regex re)
 
 void DISH::makeSpiceAdmin()
 {
+    
     string input = parseFile(CURRENT_HOST, boost::regex(".*community.*"));
     vector<string> parsed;
     boost::split(parsed, input, boost::is_any_of(" ")); 
@@ -213,6 +214,13 @@ void DISH::makeSpiceAdmin()
     string command = "putty -ssh -l " + username + " -pw " + password + " " + parsed[0] + " -t -m scripts//spiceadmin.sh";
     
     system(command.c_str());
+    
+    flushCache();
+}
+
+void DISH::flushCache()
+{
+    system("gnome-terminal --command 'sh scripts//flush.sh'");
 }
 
 void DISH::createMenu()
