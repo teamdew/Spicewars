@@ -104,6 +104,7 @@ class DISH : public QDialog{
                 QAction *quit;
                 void setIcon();
                 bool checkServer();
+								int getIssueCount();
                 QTimer *timer;        
                 void getCredentials();
                 string parseFile(string location, boost::regex re);

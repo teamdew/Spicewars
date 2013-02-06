@@ -1,4 +1,5 @@
 #include "DISH.h"
+#include "Rest.h"
 #include <QApplication>
 #include <iostream>
 #include <fstream>
@@ -27,6 +28,12 @@ DISH::DISH()
     setIcon();
     trayIcon->show();
     getCredentials();
+}
+
+void DISH::getIssueCount()
+{
+	Rest rest;
+	rest.rest_query(DESKTOP);
 }
 
 bool DISH::checkServer() 
