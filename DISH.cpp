@@ -214,8 +214,7 @@ void DISH::settings()
             
              QString username = showSettingsDialog.getUsername()->text();
              QString password = showSettingsDialog.getPassword()->text();
-             
-             //cout << "username:" + username << endl; //<< username << "password:" <<  password << endl;
+      
              
              if(username.toStdString() != "" && password.toStdString() != "")
              {
@@ -298,7 +297,7 @@ void DISH::getCredentials()
      boost::split(parsed, input, boost::is_any_of(" "));
      username = parsed.at(parsed.size() - 1);
      
-    input = parseFile(CONFIG, boost::regex("putty password.*"));
+     input = parseFile(CONFIG, boost::regex("putty password.*"));
      
      boost::split(parsed, input, boost::is_any_of(" "));
      password = parsed.at(parsed.size() - 1);
@@ -329,8 +328,6 @@ void DISH::makeSpiceAdmin()
     string command = "putty -ssh -l " + username + " -pw " + password + " " + parsed[0] + " -t -m scripts//spiceadmin.sh";
     
     system(command.c_str());
-    
-    flushCache();
 }
 
 void DISH::flushCache()
