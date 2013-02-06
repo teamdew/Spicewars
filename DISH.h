@@ -52,6 +52,7 @@ class DISH : public QDialog{
                 
                 
                 
+                
        private:
                 CURL *curl;
                 
@@ -112,7 +113,6 @@ class DISH : public QDialog{
                 void flushCache();
                 void createDynamicMenuItems();
                 void writeToConfigFile(boost::regex re, string key, string replacement);
-                
                 
         
                         
