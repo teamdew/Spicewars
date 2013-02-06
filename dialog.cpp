@@ -186,6 +186,16 @@ void settingsDialog::deleteCreds()
     
 }
 
+QLineEdit * settingsDialog::getUsername()
+{
+    return usernameText;
+}
+
+QLineEdit * settingsDialog::getPassword()
+{
+    return passwordText;
+}
+
 settingsDialog::settingsDialog() 
 {
     QGridLayout *gLayout = new QGridLayout;

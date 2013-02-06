@@ -90,6 +90,8 @@ class settingsDialog : public QDialog
         QCheckBox *messageCheckBox;
         QCheckBox *releaseCheckBox;
         bool updated;
+        QLineEdit * getUsername();
+        QLineEdit * getPassword();
     
     private slots:
         void updateMenu();

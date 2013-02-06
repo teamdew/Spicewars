@@ -211,8 +211,56 @@ void DISH::settings()
             toggleAction(showSettingsDialog.messageCheckBox, messageButton);
             
             toggleAction(showSettingsDialog.releaseCheckBox, releaseButton);
+            
+             QString username = showSettingsDialog.getUsername()->text();
+             QString password = showSettingsDialog.getPassword()->text();
+             
+             //cout << "username:" + username << endl; //<< username << "password:" <<  password << endl;
+             
+             if(username.toStdString() != "" && password.toStdString() != "")
+             {
+                writeToConfigFile(boost::regex(".*putty username.*"), "putty username", username.toStdString());
+                writeToConfigFile(boost::regex(".*putty password.*"), "putty password", password.toStdString());
+                
+                getCredentials();
+             }
+             
         }
     }
+}
+
+void DISH::writeToConfigFile(boost::regex re, string key, string replacement)
+{
+    ifstream input("config");
+    ofstream output("config.backup");
+    string line;
+    bool found = false;
+    
+    while(input.good())
+    {
+        getline(input, line);
+        if(boost::regex_match(line, re))
+        {
+                found = true;
+                line = key + ": " + replacement;
+        }
+
+        output << line << endl;
+                 
+    }
+    
+    if(!found)
+    {
+        output << key + ": " + replacement;
+    }
+    
+    
+    output.close();
+    input.close();
+    boost::filesystem3::copy_file("config.backup", "config", copy_option::overwrite_if_exists);
+    boost::filesystem3::remove("config.backup");
+    
+
 }
 
 void DISH::timeOut()
@@ -265,7 +313,7 @@ string DISH::parseFile(string location, boost::regex re)
     while(!found && getline(myFile, input))
     {
             if(boost::regex_match(input, re))
-            found = true;
+                found = true;
     }
     
     return input;
