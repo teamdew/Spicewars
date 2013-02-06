@@ -19,7 +19,6 @@ using namespace boost::filesystem;
 DISH::DISH()
 {
     trayMenu = new QMenu();
-    trayMenu->setSeparatorsCollapsible(true);
     trayIcon = new QSystemTrayIcon();
     timer = new QTimer();
     getHostsList();
@@ -57,55 +56,10 @@ void DISH::changeURL()
     if (showUrlDialog.exec())
     {
         QString url = showUrlDialog.urlText->text();
-        cout << url.toStdString();
+        urlSubmenu->setTitle(url);
     }
-}
-
-void DISH::editHosts()
-{
-    system("sudo gedit //etc//hosts");
-}
-
-void DISH::newHosts()
-{
-    newHostsDialog showHostsFileDialog;
     
-    if (showHostsFileDialog.exec())
-    {
-        QString fileName = showHostsFileDialog.fileNameText->text();
-        cout << fileName.toStdString();
-        
-        string command = "sudo gedit //etc//" + fileName.toStdString();
-        
-        system(command.c_str());
-    }
-}
-
-bool DISH::compareFile(FILE* file_compared, FILE* file_checked)
-{
-    bool diff = 0;
-    int N = 65536;
-    char* b1 = (char*) calloc (1, N+1);
-    char* b2 = (char*) calloc (1, N+1);
-    size_t s1, s2;
-
-    do {
-        s1 = fread(b1, 1, N, file_compared);
-        s2 = fread(b2, 1, N, file_checked);
-        
-        if (s1 != s2 || memcmp(b1, b2, s1)) {
-            diff = 1;
-            break;
-        }
-      } while (!feof(file_compared) || !feof(file_checked));
-
-    free(b1);
-    free(b2);
     
-    cout << "diff " << diff << endl;
-
-    if (diff) return false;
-    else return true;
 }
 
 void DISH::findCurrentHosts()
@@ -132,6 +86,31 @@ void DISH::findCurrentHosts()
     fclose(mainHosts);
 }
 
+bool DISH::compareFile(FILE* file_compared, FILE* file_checked)
+{
+    bool diff = 0;
+    int N = 65536;
+    char* b1 = (char*) calloc (1, N+1);
+    char* b2 = (char*) calloc (1, N+1);
+    size_t s1, s2;
+
+    do {
+        s1 = fread(b1, 1, N, file_compared);
+        s2 = fread(b2, 1, N, file_checked);
+        
+        if (s1 != s2 || memcmp(b1, b2, s1)) {
+            diff = 1;
+            break;
+        }
+      } while (!feof(file_compared) || !feof(file_checked));
+
+    free(b1);
+    free(b2);
+    
+    if (diff) return false;
+    else return true;
+}
+
 void DISH::changeHosts(const QString &hostsName)
 {
     path mainHosts = MAIN_HOSTS;
@@ -140,6 +119,37 @@ void DISH::changeHosts(const QString &hostsName)
     
 //    boost::filesystem3::copy_file(mainHosts, currentHosts, copy_option::overwrite_if_exists);
 //    boost::filesystem3::copy_file(newHosts, mainHosts, copy_option::overwrite_if_exists);
+}
+
+void DISH::editHosts()
+{
+    system("sudo gedit //etc//hosts");
+}
+
+void DISH::newHosts()
+{
+    newHostsDialog showHostsFileDialog;
+    
+    if (showHostsFileDialog.exec())
+    {
+        QString fileName = showHostsFileDialog.fileNameText->text();
+        cout << fileName.toStdString();
+        
+        string command = "sudo gedit //etc//" + fileName.toStdString();
+        
+        system(command.c_str());
+        
+//        int bigger = hostsVector.size() + 1;
+//        while (hostsVector.size() != bigger)
+//        {
+////            Sleep(100);
+//            hostsVector.clear();
+//            getHostsList();
+//            trayMenu->clear();
+//            createMenu();
+//        }
+        DISH();
+    }
 }
 
 void DISH::openHostsDir()
@@ -151,7 +161,7 @@ void DISH::getHostsList()
 {
     path dir_path = path (HOSTS_DIR);
     directory_iterator end_itr;
-    //prevents matches for hosts, hosts~ (or any other modiefied hosts,, hosts.deny and hosts.allow
+    //prevents matches for hosts, hosts~ (or any other modified hosts,, hosts.deny and hosts.allow
     boost::regex re("^hosts\.(?![allow]|[deny]).*(?<!~)$");
 
     for (directory_iterator itr(dir_path); itr != end_itr; ++itr)
@@ -188,9 +198,9 @@ void DISH::settings()
 
             toggleAction(showSettingsDialog.hostsFilesCheckBox, separatorsVector[1]);
             
-            for (unsigned int x = 0; x < hostsQmenusVector.size(); x++)
+            for (unsigned int x = 0; x < hostsMenusToHideVector.size(); x++)
             {
-                toggleMenu(showSettingsDialog.hostsFilesCheckBox, hostsQmenusVector[x]);
+                toggleMenu(showSettingsDialog.hostsFilesCheckBox, hostsMenusToHideVector[x]);
             }
             toggleAction(showSettingsDialog.hostsFilesCheckBox,  separatorsVector[2]);
             toggleAction(showSettingsDialog.hostsFilesCheckBox, adminButton);
@@ -264,7 +274,7 @@ string DISH::parseFile(string location, boost::regex re)
 void DISH::makeSpiceAdmin()
 {
     
-    string input = parseFile(CURRENT_HOST, boost::regex(".*community.*"));
+    string input = parseFile(MAIN_HOSTS, boost::regex(".*community.*"));
     vector<string> parsed;
     boost::split(parsed, input, boost::is_any_of(" ")); 
     
@@ -288,7 +298,7 @@ void DISH::createMenu()
      
     changeURLButton = new QAction("&Change URL", this);
     urlSubmenu->addAction(changeURLButton);
-    QObject::connect(changeURLButton, SIGNAL(triggered()), this, SLOT(changeURL()));
+    connect(changeURLButton, SIGNAL(triggered()), this, SLOT(changeURL()));
 
     
     clearCacheButton = new QAction("&Clear cache", this);
@@ -296,11 +306,11 @@ void DISH::createMenu()
     
     separatorsVector.push_back(trayMenu->addSeparator());
     
-
     for (unsigned int x = 0; x < hostsVector.size(); x++)
     {
-        userHostsSubMenu = trayMenu->addMenu(hostsVector[x].c_str());
-        hostsQmenusVector.push_back(userHostsSubMenu);
+        userHostsSubMenu = new QMenu(hostsVector[x].c_str(), this); 
+        userHostsActionsVector.push_back(trayMenu->addMenu(userHostsSubMenu));
+        hostsMenusToHideVector.push_back(userHostsSubMenu);
         
         openPuttyButton = new QAction("&Open Putty", this);
         userHostsSubMenu->addAction(openPuttyButton);
@@ -311,10 +321,7 @@ void DISH::createMenu()
         QObject::connect(communityLogsButton, SIGNAL(triggered()), this, SLOT(openCommunityLogs()));
         
         string hostsFileName = hostsVector[x];
-        cout << "hi " << hostsFileName << endl;
         string hostsFileButtonTitle = "&Switch to " + hostsFileName.substr(6, hostsFileName.length());
-        cout << "edited " << hostsFileName << endl;
-        cout << "vector " << hostsVector[x] << endl;
         
         mapper = new QSignalMapper(this);        
         changeHostsButton = new QAction(hostsFileButtonTitle.c_str(), this);
@@ -328,17 +335,17 @@ void DISH::createMenu()
 
     adminButton = new QAction("&Make Spice admin", this);
     trayMenu->addAction(adminButton);
-    QObject::connect(adminButton, SIGNAL(triggered()), this, SLOT(makeSpiceAdmin()));
+    connect(adminButton, SIGNAL(triggered()), this, SLOT(makeSpiceAdmin()));
     
     hostsSubmenu = trayMenu->addMenu("&Hosts");
     
     editButton = new QAction("&Edit current hosts file", this);
     hostsSubmenu->addAction(editButton);
-    QObject::connect(editButton, SIGNAL(triggered()), this, SLOT(editHosts()));
+    connect(editButton, SIGNAL(triggered()), this, SLOT(editHosts()));
     
     newHostsButton = new QAction("&New hosts file", this);
     hostsSubmenu->addAction(newHostsButton);
-    QObject::connect(newHostsButton, SIGNAL(triggered()), this, SLOT(newHosts()));
+    connect(newHostsButton, SIGNAL(triggered()), this, SLOT(newHosts()));
 
     
     refreshButton = new QAction("&Refresh", this);
@@ -346,7 +353,7 @@ void DISH::createMenu()
     
     hostsDirButton = new QAction("&Go to hosts file directory", this);
     hostsSubmenu->addAction(hostsDirButton);
-    QObject::connect(hostsDirButton, SIGNAL(triggered()), this, SLOT(openHostsDir()));
+    connect(hostsDirButton, SIGNAL(triggered()), this, SLOT(openHostsDir()));
  
      
     separatorsVector.push_back(trayMenu->addSeparator());
@@ -365,7 +372,7 @@ void DISH::createMenu()
     
     settingsButton = new QAction("&Settings", this);
     trayMenu->addAction(settingsButton);
-    QObject::connect(settingsButton, SIGNAL(triggered()), this, SLOT(settings()));
+    connect(settingsButton, SIGNAL(triggered()), this, SLOT(settings()));
     
     
     trayIcon->setToolTip("test test");

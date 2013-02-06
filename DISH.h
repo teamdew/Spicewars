@@ -15,6 +15,7 @@
 #include <QTimer>
 #include <boost/regex.hpp>
 #include <QSignalMapper>
+#include <QActionGroup>
 
 using namespace std;
 
@@ -55,7 +56,7 @@ class DISH : public QDialog{
                 CURL *curl;
                 
                 vector<string> hostsVector;
-                vector<QMenu*> hostsQmenusVector;
+                vector<QMenu*> hostsMenusToHideVector;
                 vector<QAction*> separatorsVector;
                 
                 QMenu *trayMenu;
@@ -64,12 +65,14 @@ class DISH : public QDialog{
                 string password;
                 string currentHostsFileName;
                 
+                string url;
                 QMenu *urlSubmenu;
                 QAction *changeURLButton;
                 QAction *defaultURLButton;
                 QAction *clearCacheButton;
                 
                 QMenu *userHostsSubMenu;
+                vector<QAction*> userHostsActionsVector;
                 QAction *openPuttyButton;
                 QAction *communityLogsButton;
                 QAction *changeHostsButton;
@@ -78,9 +81,12 @@ class DISH : public QDialog{
                 QAction *adminButton;
                 QAction *tailProdButton;
                 
+                void findCurrentsHosts();
+                void getHostsList();
                 QMenu *hostsSubmenu;
                 QAction *editButton;
                 QAction *newHostsButton;
+                void updateUserMenuForHosts(const QString &);
                 QAction *refreshButton;
                 QAction *hostsDirButton;
                 QAction *messageButton;
@@ -95,17 +101,16 @@ class DISH : public QDialog{
                 
                 QAction *quit;
                 void setIcon();
-                void getHostsList();
                 bool checkServer();
                 QTimer *timer;        
                 void getCredentials();
                 string parseFile(string location, boost::regex re);
-                void findCurrentsHosts();
                 bool compareFile(FILE*, FILE*);
                 void toggleMenu(QCheckBox*, QMenu*);  
                 void findCurrentHosts();
                 void toggleAction(QCheckBox*, QAction*);
                 void flushCache();
+                void createDynamicMenuItems();
                 
                 
         
