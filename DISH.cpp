@@ -18,7 +18,7 @@ using namespace boost::filesystem;
 
 DISH::DISH()
 {
-    trayMenu = new QMenu();
+    trayMenu = new QMenu(this);
     trayIcon = new QSystemTrayIcon();
     timer = new QTimer();
     getHostsList();
@@ -139,16 +139,27 @@ void DISH::newHosts()
         
         system(command.c_str());
         
-//        int bigger = hostsVector.size() + 1;
-//        while (hostsVector.size() != bigger)
-//        {
-////            Sleep(100);
-//            hostsVector.clear();
-//            getHostsList();
-//            trayMenu->clear();
-//            createMenu();
+        while (!(std::find(hostsVector.begin(), hostsVector.end(), fileName.toStdString()) != hostsVector.end())) 
+        {
+            hostsVector.clear();
+            getHostsList();
+        } 
+//        else {
+//            
 //        }
-        DISH();
+
+//        free (trayMenu);
+//        trayMenu = new QMenu(this);
+      
+//        trayMenu
+//        trayMenu->clear();
+        createMenu();
+        trayIcon->setContextMenu(trayMenu);
+//        setIcon();
+        
+  //      trayMenu->clear();
+    //    createMenu();
+      // DISH();
     }
 }
 
@@ -162,11 +173,12 @@ void DISH::getHostsList()
     path dir_path = path (HOSTS_DIR);
     directory_iterator end_itr;
     //prevents matches for hosts, hosts~ (or any other modified hosts,, hosts.deny and hosts.allow
-    boost::regex re("^hosts\.(?![allow]|[deny]).*(?<!~)$");
+    boost::regex re("^hosts\.(?!allow|deny).*(?<!~)");
 
     for (directory_iterator itr(dir_path); itr != end_itr; ++itr)
         if(is_regular_file(itr->status())  && boost::regex_match(itr->path().filename().c_str(), re))
             hostsVector.push_back(itr->path().filename().c_str());
+        
 }
 
 void DISH::toggleMenu(QCheckBox* checkBox, QMenu* menu)
@@ -191,6 +203,7 @@ void DISH::settings()
     
     if (showSettingsDialog.exec())
     {
+        
         if (showSettingsDialog.updated == true)
         {
             toggleMenu(showSettingsDialog.urlCheckBox, urlSubmenu);
@@ -214,6 +227,31 @@ void DISH::settings()
             
              QString username = showSettingsDialog.getUsername()->text();
              QString password = showSettingsDialog.getPassword()->text();
+             
+             if(showSettingsDialog.urlCheckBox->isChecked())
+                writeToConfigFile(boost::regex(".*Url Checkbox.*"), "Url Checkbox", "1");
+             else
+                writeToConfigFile(boost::regex(".*Url Checkbox.*"), "Url Checkbox", "0");
+             
+             if(showSettingsDialog.hostsFilesCheckBox->isChecked())
+                writeToConfigFile(boost::regex(".*Hosts Checkbox.*"), "Hosts Checkbox", "1");
+             else
+                writeToConfigFile(boost::regex(".*Hosts Checkbox.*"), "Hosts Checkbox", "0");
+             
+             if(showSettingsDialog.prodLogCheckBox->isChecked())
+                writeToConfigFile(boost::regex(".*Prod Log Checkbox.*"), "Prod Log Checkbox", "1");
+             else
+                writeToConfigFile(boost::regex(".*Prod Log Checkbox.*"), "Prod Log Checkbox", "0");
+             
+             if(showSettingsDialog.messageCheckBox->isChecked())
+                writeToConfigFile(boost::regex(".*Message Checkbox.*"), "Message Checkbox", "1");
+             else
+                writeToConfigFile(boost::regex(".*Message Checkbox.*"), "Message Checkbox", "0");
+             
+             if(showSettingsDialog.releaseCheckBox->isChecked())
+                writeToConfigFile(boost::regex(".*Release Checkbox.*"), "Release Checkbox", "1");
+             else
+                writeToConfigFile(boost::regex(".*Release Checkbox.*"), "Release Checkbox", "0");
       
              
              if(username.toStdString() != "" && password.toStdString() != "")
@@ -235,6 +273,8 @@ void DISH::writeToConfigFile(boost::regex re, string key, string replacement)
     string line;
     bool found = false;
     
+    boost::regex whitespace("\s*");
+    
     while(input.good())
     {
         getline(input, line);
@@ -243,8 +283,9 @@ void DISH::writeToConfigFile(boost::regex re, string key, string replacement)
                 found = true;
                 line = key + ": " + replacement;
         }
-
-        output << line << endl;
+        
+        if(!boost::regex_match(line, whitespace) )
+                output << line << endl;
                  
     }
     
@@ -337,9 +378,9 @@ void DISH::flushCache()
 
 void DISH::createMenu()
 {
+    trayMenu->clear();
     urlSubmenu = trayMenu->addMenu("URL");
     urlSubmenu->setFont(QFont ("Arial", 10, QFont::Bold));
-
      
     changeURLButton = new QAction("&Change URL", this);
     urlSubmenu->addAction(changeURLButton);
@@ -350,6 +391,29 @@ void DISH::createMenu()
     urlSubmenu->addAction(clearCacheButton);
     
     separatorsVector.push_back(trayMenu->addSeparator());
+    
+    string input = parseFile("config", boost::regex(".*Url Checkbox.*"));
+    vector<string> parsed;
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[2] == "1"){
+        urlSubmenu->menuAction()->setVisible(true);
+         separatorsVector[0]->setVisible(true);
+    }
+    else{
+        urlSubmenu->menuAction()->setVisible(false);
+        separatorsVector[0]->setVisible(false);
+    }
+    
+    
+    input = parseFile("config", boost::regex(".*Hosts Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    bool includeHosts;
+    
+    if (parsed[2] == "1")
+        includeHosts = true;
+    else
+        includeHosts = false;
+        
     
     for (unsigned int x = 0; x < hostsVector.size(); x++)
     {
@@ -374,6 +438,11 @@ void DISH::createMenu()
         connect(changeHostsButton, SIGNAL(triggered()), mapper, SLOT(map()));
         userHostsSubMenu->addAction(changeHostsButton);
         connect(mapper, SIGNAL(mapped(const QString &)), SLOT(changeHosts(const QString &)));
+        
+        if (includeHosts)
+            userHostsSubMenu->menuAction()->setVisible(true);
+        else
+            userHostsSubMenu->menuAction()->setVisible(false);
     }
     
     separatorsVector.push_back(trayMenu->addSeparator());
@@ -403,16 +472,52 @@ void DISH::createMenu()
      
     separatorsVector.push_back(trayMenu->addSeparator());
     
+    if (includeHosts)
+    {
+        hostsSubmenu->menuAction()->setVisible(true);
+        adminButton->setVisible(true);
+        separatorsVector[1]->setVisible(true);
+        separatorsVector[2]->setVisible(true);
+    }
+    else
+    {
+        hostsSubmenu->menuAction()->setVisible(false);
+        adminButton->setVisible(false);
+        separatorsVector[1]->setVisible(false);
+        separatorsVector[2]->setVisible(false);
+    }
+    
     tailProdButton = new QAction("&Tail production", this);
     trayMenu->addAction(tailProdButton);
+    
+    input = parseFile("config", boost::regex(".*Prod Log Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[3] == "1")
+        tailProdButton->setVisible(true);
+    else
+        tailProdButton->setVisible(false);
+    
 
     messageButton = new QAction("&Message", this);
     trayMenu->addAction(messageButton);
+    
+    input = parseFile("config", boost::regex(".*Message Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[2] == "1")
+        messageButton->setVisible(true);
+    else
+        messageButton->setVisible(false);
     
     releaseButton = new QAction("&Release", this);
     releaseButton->setFont(QFont ("Arial", 10, QFont::Bold));
     trayMenu->addAction(releaseButton);
     
+    input = parseFile("config", boost::regex(".*Release Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[2] == "1")
+        releaseButton->setVisible(true);
+    else
+        releaseButton->setVisible(false);
     
     
     settingsButton = new QAction("&Settings", this);
