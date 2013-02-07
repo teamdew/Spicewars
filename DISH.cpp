@@ -203,15 +203,6 @@ void DISH::settings()
     
     if (showSettingsDialog.exec())
     {
-        string input = parseFile("config", boost::regex(".*Url Checkbox.*"));
-        vector<string> parsed;
-        boost::split(parsed, input, boost::is_any_of(" "));
-        
-        if(parsed[2] == "0")
-            urlSubmenu->setVisible(false);
-        
-        //cout << input << endl;
-            
         
         if (showSettingsDialog.updated == true)
         {
@@ -390,7 +381,6 @@ void DISH::createMenu()
     trayMenu->clear();
     urlSubmenu = trayMenu->addMenu("URL");
     urlSubmenu->setFont(QFont ("Arial", 10, QFont::Bold));
-
      
     changeURLButton = new QAction("&Change URL", this);
     urlSubmenu->addAction(changeURLButton);
@@ -402,9 +392,31 @@ void DISH::createMenu()
     
     separatorsVector.push_back(trayMenu->addSeparator());
     
+    string input = parseFile("config", boost::regex(".*Url Checkbox.*"));
+    vector<string> parsed;
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[2] == "1"){
+        urlSubmenu->menuAction()->setVisible(true);
+         separatorsVector[0]->setVisible(true);
+    }
+    else{
+        urlSubmenu->menuAction()->setVisible(false);
+        separatorsVector[0]->setVisible(false);
+    }
+    
+    
+    input = parseFile("config", boost::regex(".*Hosts Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    bool includeHosts;
+    
+    if (parsed[2] == "1")
+        includeHosts = true;
+    else
+        includeHosts = false;
+        
+    
     for (unsigned int x = 0; x < hostsVector.size(); x++)
     {
-        cout << hostsVector.size() << endl;
         userHostsSubMenu = new QMenu(hostsVector[x].c_str(), this); 
         userHostsActionsVector.push_back(trayMenu->addMenu(userHostsSubMenu));
         hostsMenusToHideVector.push_back(userHostsSubMenu);
@@ -426,6 +438,11 @@ void DISH::createMenu()
         connect(changeHostsButton, SIGNAL(triggered()), mapper, SLOT(map()));
         userHostsSubMenu->addAction(changeHostsButton);
         connect(mapper, SIGNAL(mapped(const QString &)), SLOT(changeHosts(const QString &)));
+        
+        if (includeHosts)
+            userHostsSubMenu->menuAction()->setVisible(true);
+        else
+            userHostsSubMenu->menuAction()->setVisible(false);
     }
     
     separatorsVector.push_back(trayMenu->addSeparator());
@@ -455,16 +472,52 @@ void DISH::createMenu()
      
     separatorsVector.push_back(trayMenu->addSeparator());
     
+    if (includeHosts)
+    {
+        hostsSubmenu->menuAction()->setVisible(true);
+        adminButton->setVisible(true);
+        separatorsVector[1]->setVisible(true);
+        separatorsVector[2]->setVisible(true);
+    }
+    else
+    {
+        hostsSubmenu->menuAction()->setVisible(false);
+        adminButton->setVisible(false);
+        separatorsVector[1]->setVisible(false);
+        separatorsVector[2]->setVisible(false);
+    }
+    
     tailProdButton = new QAction("&Tail production", this);
     trayMenu->addAction(tailProdButton);
+    
+    input = parseFile("config", boost::regex(".*Prod Log Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[3] == "1")
+        tailProdButton->setVisible(true);
+    else
+        tailProdButton->setVisible(false);
+    
 
     messageButton = new QAction("&Message", this);
     trayMenu->addAction(messageButton);
+    
+    input = parseFile("config", boost::regex(".*Message Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[2] == "1")
+        messageButton->setVisible(true);
+    else
+        messageButton->setVisible(false);
     
     releaseButton = new QAction("&Release", this);
     releaseButton->setFont(QFont ("Arial", 10, QFont::Bold));
     trayMenu->addAction(releaseButton);
     
+    input = parseFile("config", boost::regex(".*Release Checkbox.*"));
+    boost::split(parsed, input, boost::is_any_of(" "));
+    if (parsed[2] == "1")
+        releaseButton->setVisible(true);
+    else
+        releaseButton->setVisible(false);
     
     
     settingsButton = new QAction("&Settings", this);
@@ -485,9 +538,9 @@ void DISH::createMenu()
 //sets the tray icon
 void DISH::setIcon()
 {
-//    if(checkServer())
-//        icon = QIcon(WORKING_PEPPER);
-//    else
+    if(checkServer())
+        icon = QIcon(WORKING_PEPPER);
+    else
         icon = QIcon(BROKEN_PEPPER);
     
     trayIcon->setIcon(icon);
