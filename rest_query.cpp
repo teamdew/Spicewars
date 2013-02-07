@@ -7,7 +7,7 @@
 #include <iostream>
 #include <sstream>
 #include <ctime>
-#include <jsoncpp/json.h>
+#include <jsoncpp/json/json.h>
 #include <fstream>
 #include <cstring>
 #include <ctime>
@@ -198,7 +198,7 @@ int Rest::rest_query(int project_num) {
 }
 
 
-int main(int argc, char *argv[]) {
+/*int main(int argc, char *argv[]) {
   //string default_url = "issues.json";
 	string project_url = "projects/desktop/versions.json";
 	string community_count = "issues.json?project_id=3&&status_id=open";
@@ -207,6 +207,6 @@ int main(int argc, char *argv[]) {
 	//rest_q.curl_code(project_url);
 	
 	cout<<rest_q.rest_query(DESKTOP)<<endl;
-}
+}*/
 	
 

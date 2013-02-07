@@ -48,6 +48,7 @@ class DISH : public QDialog{
                 void openPutty();
                 void openCommunityLogs();
                 void makeSpiceAdmin();
+                void messages();
                 
                 
                 
@@ -56,6 +57,7 @@ class DISH : public QDialog{
                 
        private:
                 CURL *curl;
+                string current_url;
                 
                 vector<string> hostsVector;
                 vector<QMenu*> hostsMenusToHideVector;

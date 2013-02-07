@@ -293,3 +293,35 @@ string settingsDialog::parseFile(string location, boost::regex re) {
 
     return input;
 }
+
+messageDialog::messageDialog() {
+    QGridLayout *gLayout = new QGridLayout;
+    gLayout->setColumnStretch(1, 2);
+
+    fileNameLabel = new QLabel("Message:");
+    okButton = new QPushButton("OK");
+    cancelButton = new QPushButton("Cancel");
+
+    fileNameText = new QLineEdit;
+
+    gLayout->addWidget(fileNameLabel, 0, 0);
+    gLayout->addWidget(fileNameText, 1, 0, 1, 3);
+
+    setWindowTitle("Send Message");
+
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addWidget(okButton);
+    buttonLayout->addWidget(cancelButton);
+
+    gLayout->addLayout(buttonLayout, 3, 1, 1, 2, Qt::AlignRight);
+
+    QVBoxLayout *mainLayout = new QVBoxLayout;
+    mainLayout->addLayout(gLayout);
+    setLayout(mainLayout);
+
+    connect(okButton, SIGNAL(clicked()),
+            this, SLOT(accept()));
+
+    connect(cancelButton, SIGNAL(clicked()),
+            this, SLOT(reject()));
+}

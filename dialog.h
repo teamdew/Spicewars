@@ -111,6 +111,22 @@ class settingsDialog : public QDialog
     
 };
 
+class messageDialog : public QDialog
+{
+    Q_OBJECT;
+    public:
+        messageDialog();
+        QLineEdit *fileNameText;
+        
+    private slots:
+        //void makeNewHostsFile();
+        //void doNothing();
+
+    private:
+        QLabel *fileNameLabel;
+        QPushButton *okButton;
+        QPushButton *cancelButton;   
+};
  
 
 #endif	/* DIALOG_H */

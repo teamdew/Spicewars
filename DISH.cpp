@@ -1,5 +1,5 @@
 #include "DISH.h"
-#include "Rest.h"
+#include "rest_query.h"
 #include <QApplication>
 #include <iostream>
 #include <fstream>
@@ -30,10 +30,11 @@ DISH::DISH()
     getCredentials();
 }
 
-void DISH::getIssueCount()
+int DISH::getIssueCount()
 {
 	Rest rest;
 	rest.rest_query(DESKTOP);
+        return 0;
 }
 
 bool DISH::checkServer() 
@@ -64,6 +65,7 @@ void DISH::changeURL()
     {
         QString url = showUrlDialog.urlText->text();
         urlSubmenu->setTitle(url);
+        writeToConfigFile(boost::regex(".*community url.*"), "community url", url.toStdString());     
     }
     
     
@@ -507,6 +509,7 @@ void DISH::createMenu()
 
     messageButton = new QAction("&Message", this);
     trayMenu->addAction(messageButton);
+    connect(messageButton, SIGNAL(triggered()), this, SLOT(messages()));
     
     input = parseFile("config", boost::regex(".*Message Checkbox.*"));
     boost::split(parsed, input, boost::is_any_of(" "));
@@ -514,10 +517,11 @@ void DISH::createMenu()
         messageButton->setVisible(true);
     else
         messageButton->setVisible(false);
-    
+   
     releaseButton = new QAction("&Release", this);
     releaseButton->setFont(QFont ("Arial", 10, QFont::Bold));
     trayMenu->addAction(releaseButton);
+    //connect(relButton, SIGNAL(triggered()), this, SLOT(settings()));
     
     input = parseFile("config", boost::regex(".*Release Checkbox.*"));
     boost::split(parsed, input, boost::is_any_of(" "));
@@ -542,6 +546,11 @@ void DISH::createMenu()
     timeOut();
 }
 
+void DISH::messages()
+{
+    messageDialog showMessageDialog;
+    showMessageDialog.exec();
+}
 //sets the tray icon
 void DISH::setIcon()
 {

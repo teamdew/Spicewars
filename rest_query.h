@@ -1,5 +1,5 @@
-#ifndef DISH_H
-#define DISH_H
+#ifndef REST_QUERY_H
+#define REST_QUERY_H
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -8,7 +8,7 @@
 #include <iostream>
 #include <sstream>
 #include <ctime>
-#include <jsoncpp/json.h>
+#include <jsoncpp/json/json.h>
 #include <fstream>
 #include <cstring>
 #include <ctime>
