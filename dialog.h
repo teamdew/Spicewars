@@ -11,6 +11,7 @@
 #include <QDialog>
 #include <QCheckBox>
 #include <QGroupBox>
+#include <boost/regex.hpp>
 
 using namespace std;
 
@@ -106,6 +107,7 @@ class settingsDialog : public QDialog
         QPushButton *removeButton;
         QGroupBox *showHideGroup;
         QGroupBox *credentialsGroup;
+        string parseFile(string location, boost::regex re);
     
 };
 
