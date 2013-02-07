@@ -117,6 +117,7 @@ class DISH : public QDialog{
                 void flushCache();
                 void createDynamicMenuItems();
                 void writeToConfigFile(boost::regex re, string key, string replacement);
+                void setCurrentURL();
 
                 
         

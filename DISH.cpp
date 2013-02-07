@@ -25,6 +25,7 @@ DISH::DISH()
     getHostsList();
     findCurrentHosts();
     curl = curl_easy_init();
+    setCurrentURL();
     setIcon();
     trayIcon->show();
     getCredentials();
@@ -37,12 +38,20 @@ int DISH::getIssueCount()
         return 0;
 }
 
+void DISH::setCurrentURL()
+{
+    string input = parseFile("config", boost::regex(".*community url.*"));
+    vector<string> parsed;
+    boost::split(parsed, input, boost::is_any_of(" "));
+    current_url = parsed[2];
+}
+
 bool DISH::checkServer() 
 {   
 
     long http_code;
     if(curl) {
-        curl_easy_setopt(curl, CURLOPT_URL, "community.spiceworks.com");
+        curl_easy_setopt(curl, CURLOPT_URL, current_url.c_str());
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, 7L);
         curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
         //maybe we should ask someone how many redirects there are in spiceworks, it depends on the company
@@ -65,7 +74,8 @@ void DISH::changeURL()
     {
         QString url = showUrlDialog.urlText->text();
         urlSubmenu->setTitle(url);
-        writeToConfigFile(boost::regex(".*community url.*"), "community url", url.toStdString());     
+        writeToConfigFile(boost::regex(".*community url.*"), "community url", url.toStdString());
+        current_url = url.toStdString();
     }
     
     
@@ -388,7 +398,7 @@ void DISH::flushCache()
 void DISH::createMenu()
 {
     trayMenu->clear();
-    urlSubmenu = trayMenu->addMenu("URL");
+    urlSubmenu = trayMenu->addMenu(current_url.c_str());
     urlSubmenu->setFont(QFont ("Arial", 10, QFont::Bold));
      
     changeURLButton = new QAction("&Change URL", this);
@@ -550,6 +560,7 @@ void DISH::messages()
 {
     messageDialog showMessageDialog;
     showMessageDialog.exec();
+    
 }
 //sets the tray icon
 void DISH::setIcon()
