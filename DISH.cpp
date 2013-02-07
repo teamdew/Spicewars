@@ -11,6 +11,7 @@
 #include <string.h>
 #include <QSystemTrayIcon>
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 
 using namespace std;
@@ -34,8 +35,8 @@ DISH::DISH()
 int DISH::getIssueCount()
 {
 	Rest rest;
-	rest.rest_query(DESKTOP);
-        return 0;
+	return rest.rest_query(DESKTOP);
+        
 }
 
 void DISH::setCurrentURL()
@@ -528,7 +529,9 @@ void DISH::createMenu()
     else
         messageButton->setVisible(false);
    
-    releaseButton = new QAction("&Release", this);
+    //releaseButton = new QAction("&Release", this);
+    cout << boost::lexical_cast<std::string>(getIssueCount())  + " open community tickets left" << endl;
+    releaseButton = new QAction((boost::lexical_cast<std::string>(getIssueCount())  + " open community tickets left").c_str(), this);
     releaseButton->setFont(QFont ("Arial", 10, QFont::Bold));
     trayMenu->addAction(releaseButton);
     //connect(relButton, SIGNAL(triggered()), this, SLOT(settings()));
